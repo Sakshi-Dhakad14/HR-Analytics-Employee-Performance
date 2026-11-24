@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Manage users{% endblock %}
+{% block heading %}Manage users{% endblock %}
+{% block content %}
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% for cat, m in msgs %}<div class="alert {{ cat }}" role="status">{{ m }}</div>{% endfor %}
+{% endwith %}
+
+<div class="card" style="margin-bottom:16px">
+  <p class="muted" style="margin-top:0">
+    <b>Admin</b>: everything, plus managing users. <b>HR analyst</b>: all dashboards, predictions,
+    employee details and downloads. <b>Viewer</b>: Overview and Model Performance only.
+  </p>
+  <h3>Add a user</h3>
+  <form method="POST" action="{{ url_for('users_add') }}" class="form-grid">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <div><label for="n-user">Username</label>
+      <input id="n-user" type="text" name="username" autocapitalize="none" required></div>
+    <div><label for="n-name">Full name</label>
+      <input id="n-name" type="text" name="full_name"></div>
+    <div><label for="n-mail">Email (optional)</label>
+      <input id="n-mail" type="text" name="email" autocapitalize="none"></div>
+    <div><label for="n-role">Role</label>
+      <select id="n-role" name="role">
+        {% for key, label in ROLES.items() %}
+          <option value="{{ key }}" {{ 'selected' if key == 'viewer' }}>{{ label }}</option>
+        {% endfor %}
+      </select></div>
+    <div><label for="n-pass">Temporary password</label>
+      <input id="n-pass" type="password" name="password" minlength="8" autocomplete="new-password" required></div>
+    <div style="align-self:end"><button class="btn" type="submit">Create user</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <h3>All users ({{ users|length }})</h3>
+  <div class="table-scroll">
+    <table class="data users">
+      <thead><tr><th>User</th><th>Role and status</th><th>Last sign-in</th><th>Reset password</th></tr></thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td><b>{{ u.username }}</b>
+            {% if u.id == me.id %}<span class="badge role">you</span>{% endif %}
+            {% if u.reset_requested_at %}<span class="badge Medium">Reset requested</span>{% endif %}
+            <div class="muted">{{ u.full_name }}{% if u.email %} &middot; {{ u.email }}{% endif %}</div></td>
+          <td>
+            <form method="POST" action="{{ url_for('users_update', uid=u.id) }}">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <select name="role" aria-label="Role for {{ u.username }}">
+                {% for key, label in ROLES.items() %}
+                  <option value="{{ key }}" {{ 'selected' if u.role == key }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <select name="active" aria-label="Status for {{ u.username }}">
+                <option value="1" {{ 'selected' if u.active }}>Active</option>
+                <option value="0" {{ 'selected' if not u.active }}>Disabled</option>
+              </select>
+              <button class="btn btn-outline" type="submit">Save</button>
+            </form>
+          </td>
+          <td>{{ u.last_login or 'Never' }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('users_reset', uid=u.id) }}">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <input type="password" name="password" minlength="8" placeholder="New password"
+                     aria-label="New password for {{ u.username }}" autocomplete="new-password" required>
+              <button class="btn btn-outline" type="submit">Reset</button>
+            </form>
+            {% if u.active %}
+            <form method="POST" action="{{ url_for('users_link', uid=u.id) }}" style="margin-top:6px">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <button class="btn btn-outline" type="submit">Create reset link</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forgot password | HR Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    document.documentElement.setAttribute(
+      'data-theme', localStorage.getItem('theme') || 'light');
+  </script>
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h2>Forgot password</h2>
+    {% if sent %}
+      <div class="alert ok" role="status">
+        If an account matches, we have taken care of it. {% if email_enabled %}A reset link was
+        emailed if the account has an email address.{% endif %}
+        Your administrator can also create a reset link for you. Links work once and expire in 30 minutes.
+      </div>
+      <a class="btn btn-full" href="{{ url_for('login') }}">Back to sign in</a>
+    {% else %}
+      <p class="muted">Enter your username or email. {% if email_enabled %}We will email you a reset link.{% else %}Your administrator will be notified and can send you a reset link.{% endif %}</p>
+      <form method="POST">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label for="identity">Username or email</label>
+        <input id="identity" type="text" name="identity" autocapitalize="none"
+               spellcheck="false" required autofocus>
+        <button type="submit" class="btn btn-full">Request reset</button>
+      </form>
+      <p class="small" style="margin-top:16px"><a class="link" href="{{ url_for('login') }}">Back to sign in</a></p>
+    {% endif %}
+  </div>
+</body>
+</html>

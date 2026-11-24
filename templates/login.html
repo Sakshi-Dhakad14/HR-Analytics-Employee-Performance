@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | HR Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    document.documentElement.setAttribute(
+      'data-theme', localStorage.getItem('theme') || 'light');
+  </script>
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h2>📊 HR Analytics</h2>
+    <p class="muted">Employee performance and attrition insights for {{ company }}.</p>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, m in msgs %}<div class="alert {{ cat }}" role="status">{{ m }}</div>{% endfor %}
+    {% endwith %}
+    {% if error %}<div class="alert error" role="alert">{{ error }}</div>{% endif %}
+
+    <form method="POST" autocomplete="on">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <label for="username">Username</label>
+      <input id="username" type="text" name="username" autocomplete="username"
+             autocapitalize="none" spellcheck="false" required autofocus>
+      <label for="password">Password</label>
+      <div class="pw-wrap">
+        <input id="password" type="password" name="password"
+               autocomplete="current-password" required>
+        <button type="button" class="pw-toggle" id="pwToggle" aria-controls="password">Show</button>
+      </div>
+      <a class="link" href="{{ url_for('forgot') }}">Forgot password?</a>
+      <button type="submit" class="btn btn-full">Sign in</button>
+    </form>
+    <p class="muted small" style="margin-top:16px">Accounts are created by an administrator.</p>
+  </div>
+  <script>
+    const pw = document.getElementById('password'), tg = document.getElementById('pwToggle');
+    tg.addEventListener('click', () => {
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      tg.textContent = show ? 'Hide' : 'Show';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Not allowed{% endblock %}
+{% block heading %}You don't have access to this page{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <p>Your role ({{ ROLES.get(current_role, current_role) }}) can't open this page.
+     Ask an administrator if you need a different role.</p>
+  <a class="btn" href="{{ url_for('overview') }}">Back to Overview</a>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reset password | HR Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    document.documentElement.setAttribute(
+      'data-theme', localStorage.getItem('theme') || 'light');
+  </script>
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <h2>Choose a new password</h2>
+    {% if invalid %}
+      <div class="alert error" role="alert">This reset link is invalid, already used, or expired.</div>
+      <a class="btn btn-full" href="{{ url_for('forgot') }}">Request a new link</a>
+    {% else %}
+      <p class="muted">Account: <b>{{ username }}</b></p>
+      {% with msgs = get_flashed_messages(with_categories=true) %}
+        {% for cat, m in msgs %}<div class="alert {{ cat }}" role="alert">{{ m }}</div>{% endfor %}
+      {% endwith %}
+      <form method="POST">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label for="new">New password (at least 8 characters)</label>
+        <input id="new" type="password" name="new" minlength="8" autocomplete="new-password" required autofocus>
+        <label for="con">Confirm new password</label>
+        <input id="con" type="password" name="confirm" minlength="8" autocomplete="new-password" required>
+        <button type="submit" class="btn btn-full">Save password</button>
+      </form>
+    {% endif %}
+  </div>
+</body>
+</html>

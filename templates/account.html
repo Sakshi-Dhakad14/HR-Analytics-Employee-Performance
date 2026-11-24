@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block heading %}Your account{% endblock %}
+{% block content %}
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% for cat, m in msgs %}<div class="alert {{ cat }} narrow" role="status">{{ m }}</div>{% endfor %}
+{% endwith %}
+<div class="card narrow">
+  <p class="muted" style="margin-top:0">Signed in as <b>{{ me.username }}</b> ({{ ROLES[me.role] }}).</p>
+  <h3>Email for password reset</h3>
+  <form method="POST" action="{{ url_for('account_email') }}" style="margin-bottom:22px">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <div class="field"><label for="mail">Email address</label>
+      <input id="mail" type="text" name="email" value="{{ me.email }}" autocapitalize="none"
+             placeholder="you@example.com"></div>
+    <button class="btn btn-outline" type="submit">Save email</button>
+  </form>
+  <h3>Change password</h3>
+  <form method="POST">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <div class="field"><label for="cur">Current password</label>
+      <input id="cur" type="password" name="current" autocomplete="current-password" required></div>
+    <div class="field"><label for="new">New password (at least 8 characters)</label>
+      <input id="new" type="password" name="new" minlength="8" autocomplete="new-password" required></div>
+    <div class="field"><label for="con">Confirm new password</label>
+      <input id="con" type="password" name="confirm" minlength="8" autocomplete="new-password" required></div>
+    <button class="btn" type="submit">Change password</button>
+  </form>
+</div>
+{% endblock %}
